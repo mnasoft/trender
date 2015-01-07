@@ -32,7 +32,14 @@
 	  (aref a (1+ (* i 2))) (cadr p)
 	  )))
 
-(defun multiple-graph (p-lst color-lst width height &optional (host "127.0.0.1"))
+(defun multiple-graph
+    (p-lst
+     color-lst
+     width height
+     &optional
+       (host (cond (( equal (software-type) "Linux") "")
+		   (( equal (software-type) "Windows") "127.0.0.1")
+		   (T ""))))
   "
 Пример использования:
 (multiple-graph
@@ -53,14 +60,14 @@
 	 (white (xlib:screen-white-pixel screen))
 	 (root-window (xlib:screen-root screen))
 	 (grackon-lst (mapcar
-		      #'(lambda(color)
-			 (xlib:create-gcontext
-			  :drawable root-window
-			  :foreground (xlib:alloc-color (xlib:window-colormap root-window) color)
-			  :background white
-			  :line-width 1)
-			 )
-		      color-lst))
+		       #'(lambda(color)
+			   (xlib:create-gcontext
+			    :drawable root-window
+			    :foreground (xlib:alloc-color (xlib:window-colormap root-window) color)
+			    :background white
+			    :line-width 1)
+			   )
+		       color-lst))
 	 (my-window (xlib:create-window
 		     :parent root-window
 		     :x 0

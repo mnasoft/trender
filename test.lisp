@@ -43,15 +43,13 @@
 ;;;;--------------------------------------------------------------------------------
 
 (defvar assa)
-(setf assa (read-data-from-file "~/quicklisp/local-projects/trender/data.txt"))
-
-(defun assa()
-  (read-data-from-file "~/quicklisp/local-projects/trender/data.txt")
-  (merge-pathnames "~/quicklisp/local-projects/trender/data.txt")
-  )
-
 (defvar bassa)
+
+(setf assa (read-data-from-file "~/MyDoc/git/clisp/trender/data.txt"))
 (setf bassa (array2d->list-array-first-2..n (list-list->array assa)))
+
+(defun foo()
+  (read-data-from-file "~/MyDoc/git/clisp/trender/data.txt"))
 
 (defun test_02()
   (multiple-graph

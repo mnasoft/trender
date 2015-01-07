@@ -80,7 +80,15 @@
 		height))
 
 
-(defun single-graph (points width height &optional (host "127.0.0.1"))
+(defun single-graph
+    (points
+     width
+     height
+     &optional
+       (host (cond
+	       (( equal (software-type) "Linux") "")
+	       (( equal (software-type) "Windows") "127.0.0.1")
+	       (T ""))))
   (let* ((display (xlib:open-display host))
 	 (screen (first (xlib:display-roots display)))
 	 (black (xlib:screen-black-pixel screen))

@@ -23,7 +23,7 @@ data.text:
   (let (
 	(p (merge-pathnames ps))
 	)
-    (with-open-file (s p :if-does-not-exist (format T "!!!1"))
+    (with-open-file (s p :if-does-not-exist (format T "Файл: ~A не существует!" ps))
       (do
        ( (l (read-line s) (read-line s nil 'eof))
 	 (lst nil)
