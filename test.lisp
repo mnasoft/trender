@@ -45,7 +45,15 @@
 (defvar assa)
 (defvar bassa)
 
-(setf assa (read-data-from-file "~/MyDoc/git/clisp/trender/data.txt"))
+(setf
+ assa
+ (cond
+   ((equal (software-type) "Win32")
+    (read-data-from-file "E:/home/namatv/Develop/clisp/trender/data.txt"))
+   ((equal (software-type) "Linux")
+    (read-data-from-file "~/MyDoc/git/clisp/trender/data.txt"))
+   ))
+
 (setf bassa (array2d->list-array-first-2..n (list-list->array assa)))
 
 (defun foo()

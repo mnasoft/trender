@@ -38,7 +38,7 @@
      width height
      &optional
        (host (cond (( equal (software-type) "Linux") "")
-		   (( equal (software-type) "Windows") "127.0.0.1")
+		   (( equal (software-type) "Win32") "127.0.0.1")
 		   (T ""))))
   "
 Пример использования:
