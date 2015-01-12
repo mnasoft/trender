@@ -6,7 +6,7 @@
 (defvar assa)
 (defvar bassa)
 
-(setf *time-list* (create-time-list 0 1000 5000))
+(setf *time-list* (create-time-list 0 1000 10))
 
 (defun test_01()
   (multiple-graph

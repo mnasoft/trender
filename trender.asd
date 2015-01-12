@@ -11,5 +11,6 @@
 	       (:file "data-import")
 	       (:file "graph-f")
 	       (:file "multiple-graph")
+	       (:file "key")
 	       (:file "test")
 	       ))
