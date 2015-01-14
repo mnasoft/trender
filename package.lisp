@@ -12,5 +12,6 @@
   (:export array2d->list-array-first-2..n)
   (:export test_01)
   (:export test_02)
-  (:export test_03))
+  (:export test_03)
+  (:export test-vector-matr-mult))
 

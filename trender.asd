@@ -4,7 +4,7 @@
   :description "Describe trender here"
   :author "Your Name <your.name@example.com>"
   :license "Specify license here"
-  :depends-on (#:clx)
+  :depends-on (#:clx #:l-math)
   :serial t
   :components ((:file "package")
                (:file "trender")

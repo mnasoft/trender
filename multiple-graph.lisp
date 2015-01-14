@@ -2,8 +2,6 @@
 
 (in-package #:trender)
 
-
-
 (defun create-time-list (start end n)
   (do ( (rez nil)
 	(i 0 (1+ i)))
@@ -156,8 +154,8 @@
 		       )
 		 nil)
       (:button-press (x y)
-		     (display-close my-window display)
-		     (cons x y))
+		     ;(display-close my-window display)
+		     (cons x y)nil)
       (:key-press (code)
 		  (setf bmap (xlib:query-keymap display)
 			bmap-lst (append bmap-lst (list (list code bmap))))
@@ -193,4 +191,57 @@
 ;(test_01)
 ;(test_02)
 
+(defun calc-matrix(x-lst y-lst width height)
+  "Вычисляет матрицу преобразования такую, чтобы 
+точки, заданные елементами списков x-lst и y-lst,
+после преобразования с ее попощью вписывались в 
+прямоугольную область с шириной width и высотой height."
+  (multiple-value-bind (x-min x-max y-min y-max) (bound-xy-vec (make-xy-array  x-lst y-lst))
+    (l-math:*
+     (l-math:make-matrix 3 3 :initial-elements (list 1.0 0.0 0.0 0.0 -1.0 height 0.0 0.0 1.0))
+     (l-math:create-scale-matrix (list (/ width (- x-max x-min) ) (/ height (- y-max y-min) ) 1.0d0))
+     (l-math:create-translation-matrix (list (- 0.0  x-min) (- 0.0 y-min))))))
 
+(defun m-xy(matrix xy-arr)
+  "Возвращает целочисленный массив координат точек, являющийся результатом
+умножения координат, заданных в массивом xy-arr, на матрицу преобразования matrix.
+Пример использования:
+(let ((x-lst (list 150.0 200.0 350.0 500.0))
+      (y-lst (list 3.5 4.8 6.9 5.6))
+      (width 300)
+      (height 400))
+  (m-xy (calc-matrix x-lst y-lst width height)
+	(make-xy-array x-lst y-lst)))
+"
+  (do*
+   (
+    (len (array-dimension xy-arr 0))
+    (rez (make-array len :element-type 'integer))
+    (i 0 (+ i 2))
+    (j 1 (+ j 2))
+    (v-from (l-math:vector 0.0 0.0 1.0))
+    (v-to(l-math:vector 0.0 0.0 1.0))
+    )
+   ((>= j len) rez)
+    (setf
+     (l-math:elt v-from 0) (aref xy-arr i)
+     (l-math:elt v-from 1) (aref xy-arr j)
+     v-to (l-math:* m v-from)
+     (aref rez i) (round(l-math:elt v-to 0))
+     (aref rez j) (round (l-math:elt v-to 1)))))
+
+;;
+(defvar x-lst)
+(defvar y-lst)
+(defvar width)
+(defvar height)
+
+(setf
+ x-lst (list 150.0 200.0 350.0 500.0)
+ y-lst (list 3.5 4.8 6.9 5.6)
+ width 300
+ height 400)
+
+(l-math:*
+ (calc-matrix x-lst y-lst width height)
+ (l-math:vector 150.0 3.5 1.0))
