@@ -46,89 +46,73 @@
       a)))
 
 
-(defun make-xy-array(xl yl)
+(defun make-xy-array(x-lst y-lst)
   "Собирает из двух списков одномерный массив
-нечетными элементами которого, являются элементы списка xl;
-четными -- yl.
+нечетными элементами которого, являются элементы списка x-lst;
+четными -- y-lst.
 Пример использования:
-(make-xy-array '(0 1 2 3) '(10 11 12 13))
-=>  #(0 10 1 11 2 12 3 13)
-"
-  (do* ( (pl (mapcar #'list xl yl))
-	 (pl-len (length pl))
-	 (a (make-array (* 2 pl-len)))
-	 (p nil)
-	 (i 0 (1+ i)))
-       ((>= i pl-len) a)
-    (setf p (car pl)
-	  pl (cdr pl)
-	  (aref a (* i 2)) (car p)
-	  (aref a (1+ (* i 2))) (cadr p)
-	  )))
+(make-xy-array '(0 1 2 3 4) '(10 11 12 13))
+=>  #(0 10 1 11 2 12 3 13)"
+  (do* ( (len (* 2 (min (length x-lst) (length y-lst))))
+	 (a (make-array len)) (i 0 (+ i 2)) (j 1 (+ j 2)))
+       ((>= j len) a)
+    (setf (aref a i) (car x-lst) x-lst (cdr x-lst)
+	  (aref a j) (car y-lst) y-lst (cdr y-lst))))
 
 (defun dx-text(v)
   (- v 50)
   )
+
+(defun make-allocated-window-color(window color)
+  (xlib:alloc-color (xlib:window-colormap window) color))
+
+(defun make-grakon-list(window color-background color-list &optional (line-width 2) )
+  (mapcar
+   #'(lambda(color)
+       (xlib:create-gcontext
+	:drawable window
+	:foreground (make-allocated-window-color window color)
+	:background color-background
+	:line-width line-width)
+       )
+   color-list))
 
 (defun display-close(my-window display)
   (xlib:unmap-window my-window)
   (xlib:destroy-window my-window)
   (xlib:close-display display))
 
-(defun multiple-graph
-    (p-lst
-     color-lst
-     note-lst
-     note-dy
-     width height
-     &optional
-       (host (cond (( equal (software-type) "Linux") "")
-		   (( equal (software-type) "Win32") "127.0.0.1")
-		   (T "")))
-       ;;       (text-dx 50)
-       )
-  "
-Пример использования:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun multiple-graph (p-lst color-lst note-lst note-dy width height
+		       &optional (host (cond (( equal (software-type) "Linux") "")
+					     (( equal (software-type) "Win32") "127.0.0.1") (T ""))))
+  "Пример использования:
 (multiple-graph
  '(#(0 1.149919 2 2.9531503 4 3.9297805 6 4.3405547 8 4.275584 10 4.786599)
    #(0 1.9541985 2 3.8682532 4 4.5254917 6 4.725692 8 3.781838 10 3.025363)
    #(0 0.64563966 2 2.191235 4 2.3382676 6 2.5524974 8 2.5527945 10 2.8086839))
  (list 	  (xlib:make-color :blue 1.0 :green 0.2 :red 0.2)
 	  (xlib:make-color :blue 0.2 :green 1.0 :red 0.2)
-	  (xlib:make-color :blue 0.2 :green 0.2 :red 1.0)
-	  )
- 500
- 300
- )
-"
+	  (xlib:make-color :blue 0.2 :green 0.2 :red 1.0))
+ '(|blue| |green| |red|) '(20 40 60 80 100) 500 300)"
   (let* ((display (xlib:open-display host))
 	 (screen (first (xlib:display-roots display)))
 ;;;;	 (black (xlib:screen-black-pixel screen))
 	 (white (xlib:screen-white-pixel screen))
 	 (root-window (xlib:screen-root screen))
-	 (grackon-lst (mapcar
-		       #'(lambda(color)
-			   (xlib:create-gcontext
-			    :drawable root-window
-			    :foreground (xlib:alloc-color (xlib:window-colormap root-window) color)
-			    :background white
-			    :line-width 1)
-			   )
-		       color-lst))
-	 (my-window (xlib:create-window
-		     :parent root-window
-		     :x 0
-		     :y 0
-		     :width width
-		     :height height
-		     :background white
-		     :event-mask (xlib:make-event-mask :exposure
-						       :key-press
-						       :button-press
-						       :structure-notify)))
+	 (w1 (xlib:create-gcontext :drawable root-window
+				   :foreground (make-allocated-window-color root-window (xlib:make-color :blue 1.0 :green 1.0 :red 1.0))))
+	 (grackon-lst (make-grakon-list root-window white color-lst))
+	 (my-window
+	  (xlib:create-window :parent root-window :x 0 :y 0
+			      :width width :height height :background white :event-mask
+			      (xlib:make-event-mask :exposure :key-press :button-press :structure-notify)))
 	 (actual-width width)
 	 (actual-height height)
          (t-x-pos (- width 50))
+	 (m-time (l-math:make-identity 3))
+	 (m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a width height))) p-lst))
+	 (showable T)
 	 )
     (setf bmap-lst nil)
     (mapc #'(lambda (grackon)(describe grackon)) grackon-lst)
@@ -137,25 +121,22 @@
 	(display :force-output-p t
 		 :discard-p t)
       (:configure-notify (width height)
-			 (setf
-			  actual-width width
-                          t-x-pos (dx-text width)
-			  actual-height height)
+			 (setf actual-width width
+			       t-x-pos (dx-text width)
+			       actual-height height
+			       m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a width height))) p-lst))
 			 nil)
       (:exposure ()
-		 (mapc #'(lambda(pl grackon note dy)
-			   (xlib:draw-lines my-window
-					    grackon
-					    (fit-xy-to-window-text-xy pl actual-width  actual-height))
-			   (xlib:draw-glyphs
-			    my-window grackon t-x-pos dy (format nil "~A" note ) )
-			   )
-		       p-lst grackon-lst note-lst note-dy
-		       )
-		 nil)
-      (:button-press (x y)
-		     ;(display-close my-window display)
-		     (cons x y)nil)
+		 (when showable
+		   (setf showable nil)
+		   (xlib:draw-rectangle my-window w1 0 0 actual-width actual-height T )
+		   (mapc #'(lambda(pl grackon note dy) (xlib:draw-glyphs my-window grackon t-x-pos dy (format nil "~A" note ))) p-lst grackon-lst note-lst note-dy)
+		   (mapc #'(lambda(xy-arr grackon m) (xlib:draw-lines my-window grackon (m-xy m xy-arr))) p-lst grackon-lst m-lst) nil))
+      (:button-press (x y)(cons x y) nil)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      (:property-notify()
+		       (xlib:circulate-window-down my-window)
+		       nil )
       (:key-press (code)
 		  (setf bmap (xlib:query-keymap display)
 			bmap-lst (append bmap-lst (list (list code bmap))))
@@ -166,27 +147,44 @@
 		      (equal (list-to-bit '("R-Alt" "x")) bmap)
 		      (equal (list-to-bit '("R-Ctrl" "q")) bmap))
 		     (display-close my-window display) T)
+		    ((equal (list-to-bit '("Num-+")) bmap)
+		     (setf (l-math:matrix-elt m-time 0 0) (* (/ 16 10) (l-math:matrix-elt m-time 0 0))
+			   m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a actual-width actual-height))) p-lst)
+                          showable T)
+		     (xlib:send-event  my-window :exposure (xlib:make-event-mask :exposure) ) nil)
+		    ((equal (list-to-bit '("Num--")) bmap)
+		     (setf (l-math:matrix-elt m-time 0 0) (* (/ 10 16) (l-math:matrix-elt m-time 0 0))
+			   m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a actual-width actual-height))) p-lst)
+			   showable T)
+		     (xlib:send-event my-window :exposure (xlib:make-event-mask :exposure)) nil)
 		    ((equal (list-to-bit '("Home")) bmap)
-		     (xlib:activate-screen-saver display) nil
-;;;;(display-close my-window display) '("Home")
+		     (setf m-time (m-home m-time actual-width)
+			   m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a actual-width actual-height))) p-lst)
+			   showable T)
+		     (xlib:send-event  my-window :exposure (xlib:make-event-mask :exposure) )
+		     nil 
 		     )
 		    ((equal (list-to-bit '("End")) bmap)
-		     (display-close my-window display) '("End")
+		     (setf m-time (m-end m-time actual-width)
+			   m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a actual-width actual-height))) p-lst)
+			   showable T)
+		     (xlib:send-event  my-window :exposure (xlib:make-event-mask :exposure) )
+		     nil 
 		     )
-		     ((equal (list-to-bit '("Left")) bmap)
-		      (display-close my-window display) '("Left"))
-		     ((equal (list-to-bit '("Right")) bmap)
-		      (display-close my-window display) '("Right"))
-		     ((or (equal (list-to-bit '("Right" "R-Ctrl")) bmap)
-			  (equal (list-to-bit '("Right" "L-Ctrl")) bmap))
-		      (display-close my-window display) '("Right" "Ctrl"))
-		     ((or
-		       (equal (list-to-bit '("Left" "L-Ctrl")) bmap)
-		       (equal (list-to-bit '("Left" "R-Ctrl")) bmap))
-		      (display-close my-window display) '("Left" "Ctrl"))
-		     (T
-		     (xlib:bell display)
-		      nil))))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		    ((equal (list-to-bit '("Left")) bmap)
+		     (display-close my-window display) '("Left"))
+		    ((equal (list-to-bit '("Right")) bmap)
+		     (display-close my-window display) '("Right"))
+		    ((or (equal (list-to-bit '("Right" "R-Ctrl")) bmap)
+			 (equal (list-to-bit '("Right" "L-Ctrl")) bmap))
+		     (display-close my-window display) '("Right" "Ctrl"))
+		    ((or
+		      (equal (list-to-bit '("Left" "L-Ctrl")) bmap)
+		      (equal (list-to-bit '("Left" "R-Ctrl")) bmap))
+		     (display-close my-window display) '("Left" "Ctrl"))
+		    (T
+		     nil))))))
 
 ;(test_01)
 ;(test_02)
@@ -194,9 +192,43 @@
 (defun calc-matrix(x-lst y-lst width height)
   "Вычисляет матрицу преобразования такую, чтобы 
 точки, заданные елементами списков x-lst и y-lst,
-после преобразования с ее попощью вписывались в 
-прямоугольную область с шириной width и высотой height."
+после преобразования с ее помощью, вписывались в 
+прямоугольную область с шириной width и высотой height.
+Пример использования:
+(let ((x-lst (list 150.0 200.0 350.0 500.0))
+      (y-lst (list 3.5 4.8 6.9 5.6))
+      (width 300)
+      (height 400))
+  (calc-matrix x-lst y-lst width height))
+=> #<L-MATH:MATRIX 3 x 3
+0.857 0.000 -128.571 
+0.000 -117.647 811.765 
+0.000 0.000 1.000 >
+
+"
   (multiple-value-bind (x-min x-max y-min y-max) (bound-xy-vec (make-xy-array  x-lst y-lst))
+    (l-math:*
+     (l-math:make-matrix 3 3 :initial-elements (list 1.0 0.0 0.0 0.0 -1.0 height 0.0 0.0 1.0))
+     (l-math:create-scale-matrix (list (/ width (- x-max x-min) ) (/ height (- y-max y-min) ) 1.0d0))
+     (l-math:create-translation-matrix (list (- 0.0  x-min) (- 0.0 y-min))))))
+
+(defun calc-matrix-xy-array(xy-array width height)
+  "Вычисляет матрицу преобразования такую, чтобы 
+точки, заданные елементами массива xy-array,
+после преобразования с ее помощью, вписывались в 
+прямоугольную область с шириной width и высотой height.
+(let ((x-lst (list 150.0 200.0 350.0 500.0))
+      (y-lst (list 3.5 4.8 6.9 5.6))
+      (xy-array (make-xy-array x-lst y-lst))
+      (width 300)
+      (height 400))
+  (calc-matrix-xy-array xy-array width height))
+=> #<L-MATH:MATRIX 3 x 3
+0.857 0.000 -128.571 
+0.000 -117.647 811.765 
+0.000 0.000 1.000 >
+"
+  (multiple-value-bind (x-min x-max y-min y-max) (bound-xy-vec xy-array)
     (l-math:*
      (l-math:make-matrix 3 3 :initial-elements (list 1.0 0.0 0.0 0.0 -1.0 height 0.0 0.0 1.0))
      (l-math:create-scale-matrix (list (/ width (- x-max x-min) ) (/ height (- y-max y-min) ) 1.0d0))
@@ -212,6 +244,12 @@
       (height 400))
   (m-xy (calc-matrix x-lst y-lst width height)
 	(make-xy-array x-lst y-lst)))
+(let ((x-lst (list 150.0 200.0 350.0 500.0))
+      (y-lst (list 3.5 4.8 6.9 5.6))
+      (xy-array (make-xy-array x-lst y-lst))
+      (width 300)
+      (height 400))
+  (m-xy (calc-matrix-xy-array xy-array width height) xy-array))
 "
   (do*
    (
@@ -220,28 +258,36 @@
     (i 0 (+ i 2))
     (j 1 (+ j 2))
     (v-from (l-math:vector 0.0 0.0 1.0))
-    (v-to(l-math:vector 0.0 0.0 1.0))
+    (v-to nil)
     )
    ((>= j len) rez)
     (setf
      (l-math:elt v-from 0) (aref xy-arr i)
      (l-math:elt v-from 1) (aref xy-arr j)
-     v-to (l-math:* m v-from)
+     v-to (l-math:* matrix v-from)
      (aref rez i) (round(l-math:elt v-to 0))
      (aref rez j) (round (l-math:elt v-to 1)))))
 
-;;
 (defvar x-lst)
 (defvar y-lst)
-(defvar width)
-(defvar height)
+(setf x-lst (list 150.0 200.0 350.0 500.0)
+      y-lst (list 3.5 4.8 6.9 5.6))
 
-(setf
- x-lst (list 150.0 200.0 350.0 500.0)
- y-lst (list 3.5 4.8 6.9 5.6)
- width 300
- height 400)
 
-(l-math:*
- (calc-matrix x-lst y-lst width height)
- (l-math:vector 150.0 3.5 1.0))
+(defun m-end(m w &optional (scale (l-math:matrix-elt m 0 0)))
+  (let ((m1 (l-math:make-identity 3))
+	(m2 (l-math:make-identity 3))
+	(m3 (l-math:make-identity 3)))
+    (setf
+     (l-math:matrix-elt m1 0 2) (- w)
+     (l-math:matrix-elt m2 0 0) scale
+     (l-math:matrix-elt m3 0 2) w
+     )
+    (l-math:* m3 m2 m1)))
+
+(defun m-home (m w &optional (scale (l-math:matrix-elt m 0 0)))
+  (let ( (m1 (l-math:make-identity 3)) )
+    (setf
+     (l-math:matrix-elt m1 0 0) scale)
+    m m1))
+  
