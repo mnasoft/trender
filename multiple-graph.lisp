@@ -229,8 +229,8 @@ host - имя хоста, на котором будет выводиться о
 	 (actual-height height) ;; Текущая высота экрана
          (t-x-pos (- width 50)) ;; Смещение текста подписей относительно правой границы окна
 	 (m-time (l-math:make-identity 3)) ;; Матрица преобразования временной шкалы
-	 (p-lst-min-max (mapcar #'(lambda (el)(max el))p-lst))
-	 (m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a width height))) p-lst)) ;; Создание списка матриц преобразования трендов 
+	 
+	 (m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a width height))) p-lst)) ;; Создание списка матриц преобразования трендов
 	 (showable T) ;; Переменная отвечает за отображение трендов
 	 (bmap nil) ;; Битовая карта, соответствующая нажатым клавишам клавиатуры
 	 )
@@ -340,9 +340,9 @@ host - имя хоста, на котором будет выводиться о
 	 (actual-width width)	;; Текущая ширина экрана
 	 (actual-height height) ;; Текущая высота экрана
          (t-x-pos (- width 50)) ;; Смещение текста подписей относительно правой границы окна
-	 (p-lst x-2d-array)
+;	 (p-lst x-2d-array)
 	 (m-time (l-math:make-identity 3)) ;; Матрица преобразования временной шкалы
-	 (p-lst-min-max (mapcar #'(lambda (el)(max el))p-lst))
+;	 (p-lst-min-max (mapcar #'(lambda (el)(max el))p-lst))
 	 (m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a width height))) p-lst)) ;; Создание списка матриц преобразования трендов 
 	 (showable T) ;; Переменная отвечает за отображение трендов
 	 (bmap nil) ;; Битовая карта, соответствующая нажатым клавишам клавиатуры
