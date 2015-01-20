@@ -199,13 +199,6 @@ host - имя хоста, на котором будет выводиться о
 	  (xlib:make-color :blue 0.2 :green 0.2 :red 1.0))
  '(|blue| |green| |red|) '(20 40 60 80 100) 500 300)"
 
-(defvar p-lst)
-(setf p-lst
-      '(#(0 1.149919 2 2.9531503 4 3.9297805 6 4.3405547 8 4.275584 10 4.786599)
-	#(0 1.9541985 2 3.8682532 4 4.5254917 6 4.725692 8 3.781838 10 3.025363)
-	#(0 0.64563966 2 2.191235 4 2.3382676 6 2.5524974 8 2.5527945 10 2.8086839)))
-()
-
 (defun multiple-graph (p-lst color-lst note-lst note-dy width height
 		       &optional (host (cond (( equal (software-type) "Linux") "")
 					     (( equal (software-type) "Win32") "127.0.0.1") (T ""))))
@@ -339,7 +332,7 @@ host - имя хоста, на котором будет выводиться о
 	 (actual-width width)	;; Текущая ширина экрана
 	 (actual-height height) ;; Текущая высота экрана
          (t-x-pos (- width 50)) ;; Смещение текста подписей относительно правой границы окна
-;	 (p-lst x-2d-array)
+	 (p-lst (array2d->list-array-first-2..n x-2d-array))
 	 (m-time (l-math:make-identity 3)) ;; Матрица преобразования временной шкалы
 ;	 (p-lst-min-max (mapcar #'(lambda (el)(max el))p-lst))
 	 (m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a width height))) p-lst)) ;; Создание списка матриц преобразования трендов 
@@ -416,3 +409,20 @@ host - имя хоста, на котором будет выводиться о
 		     (display-close my-window display) '("Left" "Ctrl"))
 		    (T
 		     nil))))))
+
+;;(test_05)
+
+(defun test_05()
+  (setf assa (cond ((equal (software-type) "Win32")
+		    (read-data-from-file "D:/home/_namatv/git/clisp/trender/data.txt"))
+		   ((equal (software-type) "Linux")
+		    (read-data-from-file "~/MyDoc/git/clisp/trender/data.txt"))))
+  (setf bassa  (list-list->array assa)) ; (array2d->list-array-first-2..n ... ) 
+  (multi-graph bassa
+	       (list (xlib:make-color :blue 1.0 :green 0.2 :red 0.2)
+		     (xlib:make-color :blue 0.2 :green 1.0 :red 0.2)
+		     (xlib:make-color :blue 0.2 :green 0.2 :red 1.0)
+		     (xlib:make-color :blue 0.2 :green 0.5 :red 0.5) )
+	       (list "t04-01" "t04-02" "t04-03" "t04-04")
+	       (list 20 40 60 80 100 120 140)
+	       1000 550))
