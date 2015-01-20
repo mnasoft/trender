@@ -96,72 +96,36 @@
 
 (defun test_04()
   (key-scaner
-   (list 
-    (make-xy-array
-     *time-list*
-     (mapcar
-      #'(lambda (x) (my-sqrt_1 x :d 0.0 :k 1.5 :tau 0.15 :d_tau 0.78 :r_size 500))
-      *time-list*))
-    (make-xy-array
-     *time-list*
-     (mapcar
-      #'(lambda (x) (my-sqrt_1 x :d 0.0 :k 2.5 :tau 0.25 :d_tau 0.78 :r_size 500))
-      *time-list*))
-    (make-xy-array
-     *time-list*
-     (mapcar
-      #'(lambda (x) (my-sqrt_1 x :d 0.0 :k 0.5 :tau 0.45 :d_tau 0.78 :r_size 500))
-      *time-list*))
-    )
-   (list 	  (xlib:make-color :blue 1.0 :green 0.0 :red 0.0)
-		  (xlib:make-color :blue 0.0 :green 1.0 :red 0.0)
-		  (xlib:make-color :blue 0.0 :green 0.0 :red 1.0)
-		  )
-   (list "t04-01" "t04-02" "t04-03" "t04-04")
-   (list 20 40 60 80 100 120 140)
-   800 600))
+   (list (make-xy-array *time-list* (mapcar #'(lambda (x) (my-sqrt_1 x :d 0.0 :k 1.5 :tau 0.15 :d_tau 0.78 :r_size 500)) *time-list*)))
+   (list (xlib:make-color :blue 1.0 :green 0.0 :red 0.0)) (list "t04-01") (list 20) 800 600))
 
 ;;(test_04)
-;;bmap-list
 
-(defun test_10(lst)
-  (mapcar
-   #'(lambda(str map)
-       (list str (bit-to-int-list map))) lst bmap-list))
+(defun test_10(string-lst)
+  "Функция для определения масок нажатия на клавиши.
+Пример использования:
+(test_04) - для выхода из программы необходимо использовать Ctrl+q или Alt+x.
+Битовые массивы будут сохранены в переменной bmap-list."
+  (mapcar #'(lambda(str map) (list str (bit-to-int-list map))) string-lst bmap-list))
 
-(mapcar
- #'(lambda(el) (list (car el) (car(car(cdr el)))))
- (test_10
-  '("R-Alt" "L-Windows" "R-Windows" "Menu")
-))
+(mapcar #'(lambda(el) (list (car el) (car(car(cdr el)))))
+ (test_10 '("R-Alt" "L-Windows" "R-Windows" "Menu")))
 
 ;(mapcar  #'car key-list)
 
 '("Esc" "F1" "F2" "F3" "F4" "F5" "F6" "F7" "F8" "F9" "F10" "F11" "F12"
   "ScrollLock" "Pause"
-  )
-
-'(
   "`" "1" "2" "3" "4" "5" "6" "7" "8" "9" "0" "-" "="
   "q" "w" "e" "r" "t" "y" "u" "i" "o" "p" "[" "]"
   "a" "s" "d" "f" "g" "h" "j" "k"  "l" ";" "'" "\\"
   "z" "x" "c" "v" "b" "n" "m" "," "." "/"
-  )
-
-'(
   "Home" "Up" "PgUp" "Left" "Right" "End" "Down" "PgDn"
   "Insert" "Delete"
-  )
-
-'(
   "NumLock" "Num-/" "Num-*"
   "Num--" "Num-+" "Num-Enter"
   "Num-0" "Num-." "Num-1" "Num-2" "Num-3"
   "Num-4" "Num-5" "Num-6"
   "Num-7" "Num-8" "Num-9"
-  )
-
-'(
   "Backspace" "Tab" "Enter" "CapsLock"
   "L-Shift" "R-Shift"
   "L-Ctrl" "R-Ctrl"
