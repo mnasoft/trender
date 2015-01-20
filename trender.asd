@@ -13,4 +13,5 @@
 	       (:file "multiple-graph")
 	       (:file "key")
 	       (:file "test")
+	       (:file "key-scaner")
 	       ))
