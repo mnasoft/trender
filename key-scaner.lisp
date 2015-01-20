@@ -61,10 +61,9 @@
 Битовые массивы будут сохранены в переменной bmap-list."
   (mapcar #'(lambda(str map) (list str (bit-to-int-list map))) string-lst bmap-list))
 
-(mapcar #'(lambda(el) (list (car el) (car(car(cdr el)))))
- (test_10 '("R-Alt" "L-Windows" "R-Windows" "Menu")))
+;;(mapcar #'(lambda(el) (list (car el) (car(car(cdr el))))) (test_10 '("R-Alt" "L-Windows" "R-Windows" "Menu")))
 
-;(mapcar  #'car key-list)
+;;(mapcar  #'car key-list)
 
 '("Esc" "F1" "F2" "F3" "F4" "F5" "F6" "F7" "F8" "F9" "F10" "F11" "F12"
   "ScrollLock" "Pause"

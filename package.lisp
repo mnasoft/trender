@@ -13,5 +13,7 @@
   (:export test_01)
   (:export test_02)
   (:export test_03)
-  (:export test-vector-matr-mult))
+  (:export test_04)
+  (:export test-vector-matr-mult)
+  )
 
