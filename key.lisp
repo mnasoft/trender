@@ -38,7 +38,7 @@
 	(bm-size (array-dimension bm 0))
 	(rez "")
 	(add-str "") )
-       ((>= i 256) rez)
+       ((>= i bm-size) rez) ; ((>= i 256) rez)
     (if (= (bit bm i) 1)
 	(setf rez (concatenate 'string rez add-str (gethash i key-code-hash))
 	      add-str "+"))))
@@ -47,7 +47,7 @@
   (do* ((i 0 (1+ i))
 	(bm-size (array-dimension bm 0))
 	(rez nil))
-       ((>= i 256) rez)
+       ((>= i bm-size) rez) ; ((>= i 256) rez)
     (if (= (bit bm i) 1)
 	(setf rez (concatenate 'list rez (list(gethash i key-code-hash)))))))
 
