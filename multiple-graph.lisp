@@ -234,7 +234,6 @@ host - имя хоста, на котором будет выводиться о
 	 (showable T) ;; Переменная отвечает за отображение трендов
 	 (bmap nil) ;; Битовая карта, соответствующая нажатым клавишам клавиатуры
 	 )
-    (setf bmap-lst nil)
     (mapc #'(lambda (grackon)(describe grackon)) grackon-lst) ;; 
     (xlib:map-window my-window)
     (xlib:event-case
@@ -347,7 +346,6 @@ host - имя хоста, на котором будет выводиться о
 	 (showable T) ;; Переменная отвечает за отображение трендов
 	 (bmap nil) ;; Битовая карта, соответствующая нажатым клавишам клавиатуры
 	 )
-    (setf bmap-lst nil)
     (mapc #'(lambda (grackon)(describe grackon)) grackon-lst) ;; 
     (xlib:map-window my-window)
     (xlib:event-case
