@@ -222,7 +222,6 @@ host - имя хоста, на котором будет выводиться о
 	 (actual-height height) ;; Текущая высота экрана
          (t-x-pos (- width 50)) ;; Смещение текста подписей относительно правой границы окна
 	 (m-time (l-math:make-identity 3)) ;; Матрица преобразования временной шкалы
-	 
 	 (m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a width height))) p-lst)) ;; Создание списка матриц преобразования трендов
 	 (showable T) ;; Переменная отвечает за отображение трендов
 	 (bmap nil) ;; Битовая карта, соответствующая нажатым клавишам клавиатуры
@@ -308,16 +307,48 @@ host - имя хоста, на котором будет выводиться о
       ((>= index (length x))
        (values x-min x-max))))
 
-(bound-x-vec (car p-lst))
+(defun bound-x-2d-array(x-2d-array)
+  "Выполняет поиск минимального и максимального значения в двумерном массиве x-2d-array.
+Поиск ведется по столбцам
+Возвращает два значения: 
+- массив минимальных значений;
+- массив максимальных значений
+Пример использования:
+(bound-x-2d-array 
+#2A((10 0.9999833 1.4999437 100 3.1622777)
+    (11 1.0999779 1.6499251 121 3.3166249)
+    (12 1.1999712 1.7999028 144 3.4641016)
+    (13 1.2999634 1.9498764 169 3.6055512)
+    (14 1.3999543 2.0998456 196 3.7416575)))
+
+=> #(10 0.9999833 1.4999437 100 3.1622777), 
+   #(14 1.3999543 2.0998456 196 3.7416575)"
+  (let* ((n (array-dimension x-2d-array 0)) ;; Количество строк
+	 (m (array-dimension x-2d-array 1)) ;; Количество столбцов
+	 (x-min (make-array m))
+	 (x-max (make-array m)))
+    (do ((j 0 (1+ j)))
+	((>= j m) 'done)
+      (setf (aref x-min j) (aref x-2d-array 0 j)
+	    (aref x-max j) (aref x-2d-array 0 j)))
+    (do ((i 1 (1+ i)))
+	((>= i n) 'done)
+      (do ((j 0 (1+ j)))
+	  ((>= j m) 'done)
+	(setf (aref x-min j) (min (aref x-min j) (aref x-2d-array i j))
+	      (aref x-max j) (max (aref x-max j) (aref x-2d-array i j)))))
+    (format T "~Ax~A" n m)
+    (values x-min x-max)))
 
 (defun multi-graph (x-2d-array color-lst note-lst note-dy width height
-		       &optional (host (cond (( equal (software-type) "Linux") "")
-					     (( equal (software-type) "Win32") "127.0.0.1") (T ""))))
+		    &optional (host (cond (( equal (software-type) "Linux") "")
+					  (( equal (software-type) "Win32") "127.0.0.1") (T ""))))
   (let* ((display (xlib:open-display host))	       ;; Дисплей
 	 (screen (first (xlib:display-roots display))) ;; Экран
 	 (white (xlib:screen-white-pixel screen))      ;;
 	 (root-window (xlib:screen-root screen)) ;; Корневое окно
 	 (i 0) ;; Индекс, задающий текущее положение курсора трендера
+	 (xi (aref x-2d-array i 0)) ;; Значение переменой времени, соответствующее текущему положению трендера
 	 (w1 (xlib:create-gcontext
 	      :drawable root-window
 	      :foreground (make-allocated-window-color root-window
@@ -334,10 +365,11 @@ host - имя хоста, на котором будет выводиться о
          (t-x-pos (- width 50)) ;; Смещение текста подписей относительно правой границы окна
 	 (p-lst (array2d->list-array-first-2..n x-2d-array))
 	 (m-time (l-math:make-identity 3)) ;; Матрица преобразования временной шкалы
-;	 (p-lst-min-max (mapcar #'(lambda (el)(max el))p-lst))
+					;	 (p-lst-min-max (mapcar #'(lambda (el)(max el))p-lst))
 	 (m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a width height))) p-lst)) ;; Создание списка матриц преобразования трендов 
 	 (showable T) ;; Переменная отвечает за отображение трендов
 	 (bmap nil) ;; Битовая карта, соответствующая нажатым клавишам клавиатуры
+	 (x-min-max-lst (multiple-value-list (bound-x-2d-array x-2d-array))) ;; Список из манимальных и максимальных значений точек
 	 )
     (mapc #'(lambda (grackon)(describe grackon)) grackon-lst) ;; 
     (xlib:map-window my-window)
@@ -426,3 +458,32 @@ host - имя хоста, на котором будет выводиться о
 	       (list "t04-01" "t04-02" "t04-03" "t04-04")
 	       (list 20 40 60 80 100 120 140)
 	       1000 550))
+
+(defun bound-x-2d-array-min-max(x-2d-array foo)
+  "Выполняет поиск минимального и максимального значения в двумерном массиве x-2d-array.
+Поиск ведется по столбцам
+Возвращает два значения: 
+- массив минимальных значений;
+- массив максимальных значений
+Пример использования:
+(bound-x-2d-array 
+#2A((10 0.9999833 1.4999437 100 3.1622777)
+    (11 1.0999779 1.6499251 121 3.3166249)
+    (12 1.1999712 1.7999028 144 3.4641016)
+    (13 1.2999634 1.9498764 169 3.6055512)
+    (14 1.3999543 2.0998456 196 3.7416575)))
+
+=> #(10 0.9999833 1.4999437 100 3.1622777), 
+   #(14 1.3999543 2.0998456 196 3.7416575)"
+  (let* ((n (array-dimension x-2d-array 0)) ;; Количество строк
+	 (m (array-dimension x-2d-array 1)) ;; Количество столбцов
+	 (x-min (make-array m)))
+    (do ((j 0 (1+ j)))
+	((>= j m) 'done)
+      (setf (aref x-min j) (aref x-2d-array 0 j)))
+    (do ((i 1 (1+ i)))
+	((>= i n) 'done)
+      (do ((j 0 (1+ j)))
+	  ((>= j m) 'done)
+	(setf (aref x-min j) (funcall foo (aref x-min j) (aref x-2d-array i j)))))
+    x-min))

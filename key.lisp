@@ -60,7 +60,7 @@
    ("L-Alt" 64) ("Space" 65) ("R-Alt" 108) ("Windows" 133) ("Menu" 135)))
 
 (defvar key-list)
-(setf key-list key-list-home)
+(setf key-list key-list-home) ;  key-list-kbd-hp  key-list-home
 
 (setf key-code-hash (make-hash-table :size 256))
 (setf key-string-hash (make-hash-table :size 256 :test #'equal))
@@ -87,7 +87,7 @@
 
 (defun list-to-bit(lst)
   (let ((bmap (make-array 256 :element-type 'bit)))
-    (mapc #'(lambda (key) (setf (bit bmap (gethash key key-string-hash)) 1 )) lst)
+    (mapc #'(lambda (key) (setf (bit bmap (gethash key key-string-hash)) 1)) lst)
     bmap))
 
 (defun bit-to-int-list(bm)
