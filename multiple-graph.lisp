@@ -260,8 +260,6 @@
       ((>= i (array-dimension a 0)) (reverse lst))
     (setf lst (cons (aref a i) lst))))
 
-(defvar *ssttrr*)
-
 (defun multi-graph (x-2d-array color-lst note-lst note-dy width height
 		    &optional (host (cond (( equal (software-type) "Linux") "")
 					  (( equal (software-type) "Win32") "127.0.0.1") (T ""))))
@@ -271,7 +269,7 @@
 	 (root-window (xlib:screen-root screen)) ;; Корневое окно
 	 (i 0) ;; Индекс, задающий текущее положение курсора трендера
 	 (xi (aref x-2d-array i 0)) ;; Значение переменой времени, соответствующее текущему положению трендера
-	 (str-lst (array2d-i-values-string-lst x-2d-array i))
+	 (str-lst (array2d-row->string-lst x-2d-array i))
 	 (w1 (xlib:create-gcontext
 	      :drawable root-window
 	      :foreground (make-allocated-window-color root-window
@@ -319,9 +317,11 @@
       (:exposure ()
 		 (when showable
 		   (xlib:draw-rectangle my-window w1 0 0 actual-width actual-height T )
-		   (mapc #'(lambda(xy-arr grackon m) (xlib:draw-lines my-window grackon (m-xy m xy-arr))) p-lst grackon-lst m-lst)
+		   (mapc #'(lambda(xy-arr grackon m) (xlib:draw-lines my-window grackon (m-xy m xy-arr))) p-lst grackon-lst m-lst) ;; Вывод линий трендов
 		   (mapc #'(lambda(grackon note dy str)
-			     (xlib:draw-glyphs my-window grackon t-x-pos dy (format nil "~A=~A" note str))) grackon-lst note-lst note-dy (cdr str-lst))
+			     (xlib:draw-glyphs my-window grackon t-x-pos dy (format nil "~A=~A" note str)))
+			 grackon-lst note-lst note-dy (cdr str-lst)) ;; Вывод подписей и значений в текущей координате времени
+		   (xlib:draw-glyphs my-window b1 t-x-pos (- actual-height 50) (format nil "~A=~D" "Time" (car str-lst)))
 		   (xlib:draw-line my-window b1 (round actual-width 2) 0 (round actual-width 2) actual-height)
 		   )
 		 (when (not showable)
@@ -358,7 +358,7 @@
 		    ((equal (list-to-bit '("Home")) bmap)
 		     (setf
 		      i 0
-		      str-lst (array2d-i-values-string-lst x-2d-array i)
+		      str-lst (array2d-row->string-lst x-2d-array i)
 		      xi (aref x-2d-array 0 i)
 		      m-lst (mapcar #'(lambda (y-min y-max)
 					(calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max x-min xscale))
@@ -371,7 +371,7 @@
 		    ((equal (list-to-bit '("End")) bmap)
 		     (setf
 		      i (1- (array-dimension x-2d-array 0))
-		      str-lst (array2d-i-values-string-lst x-2d-array i)
+		      str-lst (array2d-row->string-lst x-2d-array i)
 		      xi (aref x-2d-array i 0)
 		      m-lst (mapcar #'(lambda (y-min y-max)
 					(calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max x-max xscale))
@@ -383,7 +383,7 @@
 		     )
 		    ((equal (list-to-bit '("Left")) bmap)
 		     (setf i (max 0 (- i 1))
-			   str-lst (array2d-i-values-string-lst x-2d-array i)
+			   str-lst (array2d-row->string-lst x-2d-array i)
 			   xi (aref x-2d-array i 0)
 			   m-lst (mapcar #'(lambda (y-min y-max)
 					     (calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max xi xscale))
@@ -395,7 +395,7 @@
 		     )
 		    ((equal (list-to-bit '("Right")) bmap)
 		     (setf i (min (1- (array-dimension x-2d-array 0)) (+ i 1))
-			   str-lst (array2d-i-values-string-lst x-2d-array i)
+			   str-lst (array2d-row->string-lst x-2d-array i)
 			   xi (aref x-2d-array i 0)
 			   m-lst (mapcar #'(lambda (y-min y-max)
 					     (calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max xi xscale))
@@ -408,7 +408,7 @@
 		    ((or (equal (list-to-bit '("Right" "R-Shift")) bmap)
 			 (equal (list-to-bit '("Right" "L-Shift")) bmap))
 		     (setf i (min (1- (array-dimension x-2d-array 0)) (+ i 10))
-			   str-lst (array2d-i-values-string-lst x-2d-array i)
+			   str-lst (array2d-row->string-lst x-2d-array i)
 			   xi (aref x-2d-array i 0)
 			   m-lst (mapcar #'(lambda (y-min y-max)
 					     (calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max xi xscale))
@@ -421,7 +421,7 @@
 		    ((or (equal (list-to-bit '("Left" "R-Shift")) bmap)
 			 (equal (list-to-bit '("Left" "L-Shift")) bmap))
 		     (setf i (max 0 (- i 10))
-			   str-lst (array2d-i-values-string-lst x-2d-array i)
+			   str-lst (array2d-row->string-lst x-2d-array i)
 			   xi (aref x-2d-array i 0)
 			   m-lst (mapcar #'(lambda (y-min y-max)
 					     (calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max xi xscale))
@@ -434,7 +434,7 @@
 		    ((or (equal (list-to-bit '("Right" "R-Ctrl")) bmap)
 			 (equal (list-to-bit '("Right" "L-Ctrl")) bmap))
 		     (setf i (min (1- (array-dimension x-2d-array 0)) (+ i 60))
-			   str-lst (array2d-i-values-string-lst x-2d-array i)
+			   str-lst (array2d-row->string-lst x-2d-array i)
 			   xi (aref x-2d-array i 0)
 			   m-lst (mapcar #'(lambda (y-min y-max)
 					     (calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max xi xscale))
@@ -447,7 +447,7 @@
 		    ((or (equal (list-to-bit '("Left" "R-Ctrl")) bmap)
 			 (equal (list-to-bit '("Left" "L-Ctrl")) bmap))
 		     (setf i (max 0 (- i 60))
-			   str-lst (array2d-i-values-string-lst x-2d-array i)
+			   str-lst (array2d-row->string-lst x-2d-array i)
 			   xi (aref x-2d-array i 0)
 			   m-lst (mapcar #'(lambda (y-min y-max)
 					     (calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max xi xscale))
@@ -460,7 +460,7 @@
 		    ((or (equal (list-to-bit '("Right" "R-Alt")) bmap)
 			 (equal (list-to-bit '("Right" "L-Alt")) bmap))
 		     (setf i (min (1- (array-dimension x-2d-array 0)) (+ i 600))
-			   str-lst (array2d-i-values-string-lst x-2d-array i)
+			   str-lst (array2d-row->string-lst x-2d-array i)
 			   xi (aref x-2d-array i 0)
 			   m-lst (mapcar #'(lambda (y-min y-max)
 					     (calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max xi xscale))
@@ -473,7 +473,7 @@
 		    ((or (equal (list-to-bit '("Left" "R-Alt")) bmap)
 			 (equal (list-to-bit '("Left" "L-Alt")) bmap))
 		     (setf i (max 0 (- i 600))
-			   str-lst (array2d-i-values-string-lst x-2d-array i)
+			   str-lst (array2d-row->string-lst x-2d-array i)
 			   xi (aref x-2d-array i 0)
 			   m-lst (mapcar #'(lambda (y-min y-max)
 					     (calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max xi xscale))
@@ -486,7 +486,7 @@
 		    ((or (equal (list-to-bit '("Right" "R-Shift" "R-Ctrl")) bmap)
 			 (equal (list-to-bit '("Right" "L-Shift" "L-Ctrl")) bmap))
 		     (setf i (min (1- (array-dimension x-2d-array 0)) (+ i 3600))
-			   str-lst (array2d-i-values-string-lst x-2d-array i)
+			   str-lst (array2d-row->string-lst x-2d-array i)
 			   xi (aref x-2d-array i 0)
 			   m-lst (mapcar #'(lambda (y-min y-max)
 					     (calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max xi xscale))
@@ -499,7 +499,7 @@
 		    ((or (equal (list-to-bit '("Left" "R-Shift" "R-Ctrl")) bmap)
 			 (equal (list-to-bit '("Left" "L-Shift" "L-Ctrl")) bmap))
 		     (setf i (max 0 (- i 3600))
-			   str-lst (array2d-i-values-string-lst x-2d-array i)
+			   str-lst (array2d-row->string-lst x-2d-array i)
 			   xi (aref x-2d-array i 0)
 			   m-lst (mapcar #'(lambda (y-min y-max)
 					     (calc-matrix-xmin-xmax-ymin-ymax actual-width actual-height x-min x-max y-min y-max xi xscale))
@@ -528,10 +528,12 @@
 	       (list 20 40 60 80 100 120 140)
 	       1000 550))
 
-(defun array2d-i-values-string-lst(a i)
+(defun array2d-row->string-lst(aray2d row)
   (do ((str-lst nil)
-       (j-len (array-dimension a 1) )
+       (j-len (array-dimension aray2d 1) )
        (j 0 (1+ j)))
       ((>= j j-len) (reverse str-lst))
-    (setf str-lst  (cons (format nil  "~D" (aref a i j)) str-lst))))
+    (setf str-lst  (cons (format nil  "~D" (aref aray2d row j)) str-lst))))
+
+(array2d-row->string-lst)
 
