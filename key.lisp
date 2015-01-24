@@ -60,7 +60,12 @@
    ("L-Alt" 64) ("Space" 65) ("R-Alt" 108) ("Windows" 133) ("Menu" 135)))
 
 (defvar key-list)
-(setf key-list key-list-home) ;  key-list-kbd-hp  key-list-home
+(setf  key-list
+       (cond
+	 ((equal (machine-instance) "nick-00")
+	  key-list-home)
+	 (T key-list-kbd-hp)))
+
 
 (setf key-code-hash (make-hash-table :size 256))
 (setf key-string-hash (make-hash-table :size 256 :test #'equal))
