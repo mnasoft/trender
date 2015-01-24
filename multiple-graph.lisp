@@ -2,6 +2,8 @@
 
 (in-package #:trender)
 
+(defparameter *font* "-*-lucida-medium-r-*-*-14-*-*-*-*-*-*")
+
 (defun create-time-list (start end n)
   (do ( (rez nil)
 	(i 0 (1+ i)))
@@ -143,6 +145,7 @@
 	:drawable window
 	:foreground (make-allocated-window-color window color)
 	:background color-background
+	:font *font*
 	:line-width line-width)
        )
    color-list))
@@ -276,7 +279,8 @@
 						       (xlib:make-color :blue 1.0 :green 1.0 :red 1.0)))) ;; Графический контекст для заднего фона окна
 	 (b1 (xlib:create-gcontext :drawable root-window
 				   :foreground (make-allocated-window-color
-						root-window (xlib:make-color :blue 0.0 :green 0.0 :red 0.0)))) ;; Графический контекст тонкой чёрной линии
+						root-window (xlib:make-color :blue 0.0 :green 0.0 :red 0.0))
+				   :font *font*)) ;; Графический контекст тонкой чёрной линии
 	 (grackon-lst (make-grakon-list root-window white color-lst)) ;; Список графических контекстов для трендов
 	 (my-window
 	  (xlib:create-window :parent root-window :x 0 :y 0 :width width :height height :background white
@@ -511,19 +515,17 @@
 		     )
 		    (T nil))))))
 
-;;(test_05)
-
 (defun test_05()
   (setf assa (cond ((equal (software-type) "Win32")
 		    (read-data-from-file "D:/home/_namatv/git/clisp/trender/data.txt"))
 		   ((equal (software-type) "Linux")
 		    (read-data-from-file "~/MyDoc/git/clisp/trender/data.txt"))))
   (setf bassa  (list-list->array assa)) ; (array2d->list-array-first-2..n ... ) 
-  (multi-graph bassaq
-	       (list (xlib:make-color :blue 1.0 :green 0.2 :red 0.2)
-		     (xlib:make-color :blue 0.2 :green 1.0 :red 0.2)
-		     (xlib:make-color :blue 0.2 :green 0.2 :red 1.0)
-		     (xlib:make-color :blue 0.2 :green 0.5 :red 0.5) )
+  (multi-graph bassa
+	       (list (xlib:make-color :blue 1.0 :green 0.0 :red 0.0)
+		     (xlib:make-color :blue 0.0 :green 1.0 :red 0.0)
+		     (xlib:make-color :blue 0.0 :green 0.0 :red 1.0)
+		     (xlib:make-color :blue 0.0 :green 0.5 :red 0.5) )
 	       (list "t04-01" "t04-02" "t04-03" "t04-04")
 	       (list 20 40 60 80 100 120 140)
 	       1000 550))
@@ -535,5 +537,4 @@
       ((>= j j-len) (reverse str-lst))
     (setf str-lst  (cons (format nil  "~D" (aref aray2d row j)) str-lst))))
 
-(array2d-row->string-lst)
-
+;;(test_05)
