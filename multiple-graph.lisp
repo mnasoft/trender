@@ -49,10 +49,10 @@
 (defun make-xy-array (x-lst y-lst)
   "Собирает из двух списков одномерный массив
 нечетными элементами которого, являются элементы списка x-lst;
-четными -- y-lst.
+четными -- y-lst
 Пример использования:
-(make-xy-array '(0 1 2 3 4) '(10 11 12 13))
-=>  #(0 10 1 11 2 12 3 13)"
+;(make-xy-array '(0 1 2 3 4) '(10 11 12 13))
+;=>  #(0 10 1 11 2 12 3 13)"
   (do* ( (len (* 2 (min (length x-lst) (length y-lst))))
 	 (a (make-array len)) (i 0 (+ i 2)) (j 1 (+ j 2)))
        ((>= j len) a)
@@ -63,17 +63,13 @@
   "Вычисляет матрицу преобразования такую, чтобы 
 точки, заданные елементами списков x-lst и y-lst,
 после преобразования с ее помощью, вписывались в 
-прямоугольную область с шириной width и высотой height.
+прямоугольную область с шириной width и высотой height
 Пример использования:
-(let ((x-lst (list 150.0 200.0 350.0 500.0))
-      (y-lst (list 3.5 4.8 6.9 5.6))
-      (width 300)
-      (height 400))
-  (calc-matrix x-lst y-lst width height))
-=> #<L-MATH:MATRIX 3 x 3
-0.857 0.000 -128.571 
-0.000 -117.647 811.765 
-0.000 0.000 1.000 >"
+;(let ((x-lst (list 150.0 200.0 350.0 500.0)) (y-lst (list 3.5 4.8 6.9 5.6)) (width 300) (height 400)) (calc-matrix x-lst y-lst width height))
+;=> #<L-MATH:MATRIX 3 x 3
+;0.857 0.000 -128.571 
+;0.000 -117.647 811.765 
+;0.000 0.000 1.000 >"
   (multiple-value-bind (x-min x-max y-min y-max) (bound-xy-vec (make-xy-array  x-lst y-lst))
     (l-math:*
      (l-math:make-matrix 3 3 :initial-elements (list 1.0 0.0 0.0 0.0 -1.0 height 0.0 0.0 1.0))
@@ -85,16 +81,11 @@
 точки, заданные елементами массива xy-array,
 после преобразования с ее помощью, вписывались в 
 прямоугольную область с шириной width и высотой height
-(let ((x-lst (list 150.0 200.0 350.0 500.0))
-      (y-lst (list 3.5 4.8 6.9 5.6))
-      (xy-array (make-xy-array x-lst y-lst))
-      (width 300)
-      (height 400))
-  (calc-matrix-xy-array xy-array width height))
-=> #<L-MATH:MATRIX 3 x 3
-0.857 0.000 -128.571 
-0.000 -117.647 811.765 
-0.000 0.000 1.000 >
+; (let ((x-lst (list 150.0 200.0 350.0 500.0)) (y-lst (list 3.5 4.8 6.9 5.6)) (xy-array (make-xy-array x-lst y-lst)) (width 300) (height 400)) (calc-matrix-xy-array xy-array width height))
+;=> #<L-MATH:MATRIX 3 x 3
+;0.857 0.000 -128.571 
+;0.000 -117.647 811.765 
+;0.000 0.000 1.000 >
 "
   (multiple-value-bind (x-min x-max y-min y-max) (bound-xy-vec xy-array)
     (l-math:*
@@ -117,29 +108,12 @@
      (l-math:create-scale-matrix (list xscale (/ height (- y-max y-min) ) 1.0d0))
      (l-math:create-translation-matrix (list (- x) (- y-min)))))
 
-(l-math:*
- (calc-matrix-xmin-xmax-ymin-ymax 1000 500 50 150 320 340 150)
- (l-math:vector 150 330 1)
- )
-
-
-
 (defun m-xy(matrix xy-arr)
   "Возвращает целочисленный массив координат точек, являющийся результатом
-умножения координат, заданных в массивом xy-arr, на матрицу преобразования matrix.
+умножения координат, заданных в массивом xy-arr, на матрицу преобразования matrix
 Пример использования:
-(let ((x-lst (list 150.0 200.0 350.0 500.0))
-      (y-lst (list 3.5 4.8 6.9 5.6))
-      (width 300)
-      (height 400))
-  (m-xy (calc-matrix x-lst y-lst width height)
-	(make-xy-array x-lst y-lst)))
-(let ((x-lst (list 150.0 200.0 350.0 500.0))
-      (y-lst (list 3.5 4.8 6.9 5.6))
-      (xy-array (make-xy-array x-lst y-lst))
-      (width 300)
-      (height 400))
-  (m-xy (calc-matrix-xy-array xy-array width height) xy-array))"
+; (let ((x-lst (list 150.0 200.0 350.0 500.0)) (y-lst (list 3.5 4.8 6.9 5.6))(width 300) (height 400)) (m-xy (calc-matrix x-lst y-lst width height) (make-xy-array x-lst y-lst)))
+;=> #(0 400 43 247 171 0 300 153)"
   (do*
    (
     (len (array-dimension xy-arr 0))
@@ -293,12 +267,12 @@ host - имя хоста, на котором будет выводиться о
 		      (equal (list-to-bit '("R-Ctrl" "q")) bmap))
 		     (display-close my-window display) T)
 		    ((equal (list-to-bit '("Num-+")) bmap)
-		     (setf (l-math:matrix-elt m-time 0 0) (* (/ 16 10) (l-math:matrix-elt m-time 0 0))
+		     (setf (l-math:matrix-elt m-time 0 0) (* 8/5 (l-math:matrix-elt m-time 0 0))
 			   m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a actual-width actual-height))) p-lst)
 			   showable T)
 		     (xlib:send-event  my-window :exposure (xlib:make-event-mask :exposure) ) nil)
 		    ((equal (list-to-bit '("Num--")) bmap)
-		     (setf (l-math:matrix-elt m-time 0 0) (* (/ 10 16) (l-math:matrix-elt m-time 0 0))
+		     (setf (l-math:matrix-elt m-time 0 0) (* 5/8 (l-math:matrix-elt m-time 0 0))
 			   m-lst (mapcar #'(lambda (xy-a)(l-math:* m-time (calc-matrix-xy-array xy-a actual-width actual-height))) p-lst)
 			   showable T)
 		     (xlib:send-event my-window :exposure (xlib:make-event-mask :exposure)) nil)
@@ -347,15 +321,8 @@ host - имя хоста, на котором будет выводиться о
 - массив минимальных значений;
 - массив максимальных значений
 Пример использования:
-(bound-x-2d-array 
-#2A((10 0.9999833 1.4999437 100 3.1622777)
-    (11 1.0999779 1.6499251 121 3.3166249)
-    (12 1.1999712 1.7999028 144 3.4641016)
-    (13 1.2999634 1.9498764 169 3.6055512)
-    (14 1.3999543 2.0998456 196 3.7416575)))
-
-=> #(10 0.9999833 1.4999437 100 3.1622777), 
-   #(14 1.3999543 2.0998456 196 3.7416575)"
+;(bound-x-2d-array #2A((10 0.9999833 1.4999437 100 3.1622777) (11 1.0999779 1.6499251 121 3.3166249) (12 1.1999712 1.7999028 144 3.4641016) (13 1.2999634 1.9498764 169 3.6055512) (14 1.3999543 2.0998456 196 3.7416575)))
+;=> #(10 0.9999833 1.4999437 100 3.1622777), #(14 1.3999543 2.0998456 196 3.7416575)"
   (let* ((n (array-dimension x-2d-array 0)) ;; Количество строк
 	 (m (array-dimension x-2d-array 1)) ;; Количество столбцов
 	 (x-min (make-array m))
@@ -663,6 +630,3 @@ host - имя хоста, на котором будет выводиться о
 	       (list "t04-01" "t04-02" "t04-03" "t04-04")
 	       (list 20 40 60 80 100 120 140)
 	       1000 550))
-
-
-
