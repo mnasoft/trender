@@ -103,7 +103,6 @@
     (if (= (bit bm i) 1)
 	(setf rez (cons i rez)))))
 
-(defun test_03()
-  (bit-to-string(list-to-bit (list "Num-6" "Windows" "Esc" "R-Ctrl" "\\"))))
+
 
 

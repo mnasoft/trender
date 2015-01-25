@@ -2,14 +2,17 @@
 
 (in-package #:trender)
 
+(defun my-sqrt(x &key (d 0.0) (k 0.0) (tau 0.0) (d_tau 0.0) (r_size 0) (r_max 1000))
+  (+ (sqrt x) d (/ (random r_size) r_max) (* k (sin (+ d_tau(* x tau))))))
+
 (defun test_01()
   (let ((array2d
 	 (list-list->array
 	  (mapcar #'(lambda (x)
 		      (list x
-			    (my-sqrt_1 x :d 0.0 :k 1.5 :tau 0.15 :d_tau 0.78 :r_size 500)
-			    (my-sqrt_1 x :d 0.0 :k 2.5 :tau 0.25 :d_tau 0.78 :r_size 500)
-			    (my-sqrt_1 x :d 0.0 :k 0.5 :tau 0.45 :d_tau 0.78 :r_size 500)))
+			    (my-sqrt x :d 0.0 :k 1.5 :tau 0.15 :d_tau 0.78 :r_size 500)
+			    (my-sqrt x :d 0.0 :k 2.5 :tau 0.25 :d_tau 0.78 :r_size 500)
+			    (my-sqrt x :d 0.0 :k 0.5 :tau 0.45 :d_tau 0.78 :r_size 500)))
 		  (create-time-list 0 1000 10000))))
 	(color-lst (list
 		    (xlib:make-color :blue 1.0 :green 0.0 :red 0.0)
@@ -18,8 +21,7 @@
 	(tag-lst (list "t04-01" "t04-02" "t04-03" "t04-04"))
 	(dy-lst (list 20 40 60 80 100 120 140))
 	(window-width 800)
-	(window-height 600)
-	)
+	(window-height 600))
     (multi-graph array2d color-lst tag-lst dy-lst window-width window-height)))
 
 (defun test_02()
@@ -37,39 +39,13 @@
 		 (list "t04-01" "t04-02" "t04-03" "t04-04")
 		 (list 20 40 60 80 100 120 140) 1000 550)))
 
-(defun pick2numbers(x-range y-range)
-  (let* ((display (xlib:open-display ""))
-	 (screen (first (xlib:display-roots display)))
-	 (black (xlib:screen-black-pixel screen))
-	 (window
-	    (xlib:create-window
-	     :parent (xlib:screen-root screen)
-	     :class :input-output
-	     :x 0
-	     :y 0
-	     :width x-range
-	     :height y-range
-	     :background black
-	     :event-mask (xlib:make-event-mask
-			  :button-press))))
-    (xlib:change-property window
-			  :wm_name
-			  "Pick two numbers"
-			  :string
-			  8
-			  :transform #'char-code)
-      (xlib:map-window window)
-      (xlib:event-case
-	  (display :force-output-p t
-		   :discard-p t)
-	(:button-press
-	 (x y)
-	 (xlib:unmap-window window)
-	 (xlib:destroy-window window)
-	 (xlib:close-display display)
-	 (cons x (- y-range (+ y 1)))))))
+(defun test_03()
+  (bit-to-string(list-to-bit (list "Num-6" "Windows" "Esc" "R-Ctrl" "\\"))))
 
-;(test_01)
-;(test_02)
+;;(test_01)
+;;(test_02)
+;;(test_03)
+
+
 
 
