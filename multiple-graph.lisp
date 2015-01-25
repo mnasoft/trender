@@ -3,12 +3,12 @@
 (in-package #:trender)
 
 ;;;;(defparameter *font* "-*-lucida-medium-r-*-*-14-*-*-*-*-*-*")
-(defparameter *font* "lucidasans-bold-14")
-(defparameter *font*  "-adobe-courier-medium-o-normal--0-0-75-75-m-0-iso8859-1")
-(defparameter *font*  "-adobe-courier-medium-o-normal--14-*-*-*-*-*-*-*")
-(defparameter *font*  "-adobe-courier-medium-*-*--17-*-*-*-*-*-*-*")
-(defparameter *font*  "-adobe-courier-bold-*-*--17-*-*-*-*-*-*-*")
-(defparameter *font*  "-adobe-times-bold-*-*--20-*-*-*-*-*-*-*")
+;;(defparameter *font* "lucidasans-bold-14")
+;;(defparameter *font*  "-adobe-courier-medium-o-normal--0-0-75-75-m-0-iso8859-1")
+;;(defparameter *font*  "-adobe-courier-medium-o-normal--14-*-*-*-*-*-*-*")
+;;(defparameter *font*  "-adobe-courier-medium-*-*--17-*-*-*-*-*-*-*")
+;;(defparameter *font*  "-adobe-courier-bold-*-*--17-*-*-*-*-*-*-*")
+;;(defparameter *font*  "-adobe-times-bold-*-*--20-*-*-*-*-*-*-*")
 (defparameter *font*  "-adobe-utopia-bold-r-*--20-*-*-*-*-*-*-*")
 
 
@@ -337,6 +337,8 @@
 		 (when showable
 		   (xlib:draw-rectangle my-window w1 0 0 actual-width actual-height T )
 		   (mapc #'(lambda(xy-arr grackon m) (xlib:draw-lines my-window grackon (m-xy m xy-arr))) p-lst grackon-lst m-lst) ;; Вывод линий трендов
+		   (mapc #'(lambda(dy m)(xlib:draw-rectangle my-window w1 (- t-x-pos 5) (- dy 25) 200 30 T )) note-dy m-lst)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;		   
 		   (mapc #'(lambda(grackon note dy str)
 			     (xlib:draw-glyphs my-window grackon t-x-pos dy (format nil "~A=~A" note str)))
 			 grackon-lst note-lst note-dy (cdr str-lst)) ;; Вывод подписей и значений в текущей координате времени
