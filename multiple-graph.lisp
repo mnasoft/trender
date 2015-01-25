@@ -277,7 +277,7 @@
        (j-len (array-dimension aray2d 1) )
        (j 0 (1+ j)))
       ((>= j j-len) (reverse str-lst))
-    (setf str-lst  (cons (format nil  "~D" (aref aray2d row j)) str-lst))))
+    (setf str-lst  (cons (format nil  "~D" (float(aref aray2d row j))) str-lst))))
 
 (defun multi-graph (x-2d-array color-lst note-lst note-dy width height
 		    &optional (host (cond (( equal (software-type) "Linux") "")
@@ -529,5 +529,3 @@
 		     nil 
 		     )
 		    (T nil))))))
-
-;;(test_05)
