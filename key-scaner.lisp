@@ -19,7 +19,6 @@
 			      :event-mask (xlib:make-event-mask :exposure :key-press :button-press :structure-notify))) ;; Окно для трендера
 	 (actual-width width)	;; Текущая ширина экрана
 	 (actual-height height) ;; Текущая высота экрана
-	 (m-time (l-math:make-identity 3)) ;; Матрица преобразования временной шкалы
 	 (bmap nil) ;; Битовая карта, соответствующая нажатым клавишам клавиатуры
 	 )
     (setf bmap-list nil)
@@ -37,7 +36,7 @@
 		 nil
 		 )
       (:button-press (x y)(cons x y) nil)
-      (:key-press (code)
+      (:key-press ()
 		  (setf bmap (xlib:query-keymap display)
 			bmap-list (append bmap-list (list bmap)))
 		  (cond

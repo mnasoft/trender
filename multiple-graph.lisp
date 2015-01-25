@@ -2,7 +2,16 @@
 
 (in-package #:trender)
 
-(defparameter *font* "-*-lucida-medium-r-*-*-14-*-*-*-*-*-*")
+;;;;(defparameter *font* "-*-lucida-medium-r-*-*-14-*-*-*-*-*-*")
+(defparameter *font* "lucidasans-bold-14")
+(defparameter *font*  "-adobe-courier-medium-o-normal--0-0-75-75-m-0-iso8859-1")
+(defparameter *font*  "-adobe-courier-medium-o-normal--14-*-*-*-*-*-*-*")
+(defparameter *font*  "-adobe-courier-medium-*-*--17-*-*-*-*-*-*-*")
+(defparameter *font*  "-adobe-courier-bold-*-*--17-*-*-*-*-*-*-*")
+(defparameter *font*  "-adobe-times-bold-*-*--20-*-*-*-*-*-*-*")
+(defparameter *font*  "-adobe-utopia-bold-r-*--20-*-*-*-*-*-*-*")
+
+
 
 (defun create-time-list (start end n)
   (do ( (rez nil)
@@ -263,6 +272,13 @@
       ((>= i (array-dimension a 0)) (reverse lst))
     (setf lst (cons (aref a i) lst))))
 
+(defun array2d-row->string-lst(aray2d row)
+  (do ((str-lst nil)
+       (j-len (array-dimension aray2d 1) )
+       (j 0 (1+ j)))
+      ((>= j j-len) (reverse str-lst))
+    (setf str-lst  (cons (format nil  "~D" (aref aray2d row j)) str-lst))))
+
 (defun multi-graph (x-2d-array color-lst note-lst note-dy width height
 		    &optional (host (cond (( equal (software-type) "Linux") "")
 					  (( equal (software-type) "Win32") "127.0.0.1") (T ""))))
@@ -289,7 +305,6 @@
 	 (actual-height height) ;; Текущая высота экрана
          (t-x-pos (dx-text width)) ;; Смещение текста подписей относительно правой границы окна
 	 (p-lst (array2d->list-array-first-2..n x-2d-array))
-	 (m-time (l-math:make-identity 3)) ;; Матрица преобразования временной шкалы
 	 (xy-min-lst (array1d->list(bound-x-2d-array-min-max x-2d-array #'min))) ;; Массив минимальных значений аргументов
 	 (xy-max-lst (array1d->list(bound-x-2d-array-min-max x-2d-array #'max))) ;; Массив максимальных значений аргументов
 	 (x-min (car xy-min-lst))
@@ -514,27 +529,5 @@
 		     nil 
 		     )
 		    (T nil))))))
-
-(defun test_05()
-  (setf assa (cond ((equal (software-type) "Win32")
-		    (read-data-from-file "D:/home/_namatv/git/clisp/trender/data.txt"))
-		   ((equal (software-type) "Linux")
-		    (read-data-from-file "~/MyDoc/git/clisp/trender/data.txt"))))
-  (setf bassa  (list-list->array assa)) ; (array2d->list-array-first-2..n ... ) 
-  (multi-graph bassa
-	       (list (xlib:make-color :blue 1.0 :green 0.0 :red 0.0)
-		     (xlib:make-color :blue 0.0 :green 1.0 :red 0.0)
-		     (xlib:make-color :blue 0.0 :green 0.0 :red 1.0)
-		     (xlib:make-color :blue 0.0 :green 0.5 :red 0.5) )
-	       (list "t04-01" "t04-02" "t04-03" "t04-04")
-	       (list 20 40 60 80 100 120 140)
-	       1000 550))
-
-(defun array2d-row->string-lst(aray2d row)
-  (do ((str-lst nil)
-       (j-len (array-dimension aray2d 1) )
-       (j 0 (1+ j)))
-      ((>= j j-len) (reverse str-lst))
-    (setf str-lst  (cons (format nil  "~D" (aref aray2d row j)) str-lst))))
 
 ;;(test_05)
