@@ -7,7 +7,7 @@
 
 (defun test_01()
   (let ((array2d
-	 (list-list->array
+	 (lst-arr:list-list->array
 	  (mapcar #'(lambda (x)
 		      (list x
 			    (my-sqrt x :d 0.0 :k 1.5 :tau 0.15 :d_tau 0.78 :r_size 500)
@@ -29,7 +29,7 @@
 	 (assa
 	  (cond ((equal (software-type) "Win32") (read-data-from-file "D:/home/_namatv/git/clisp/trender/data.txt"))
 		((equal (software-type) "Linux") (read-data-from-file "~/MyDoc/git/clisp/trender/data.txt"))))
-	 (bassa (list-list->array assa)) ; (array2d->list-array-first-2..n ... ) 
+	 (bassa (lst-arr:list-list->array assa)) ; (array2d->list-array-first-2..n ... ) 
 	 )
     (multi-graph bassa
 		 (list (xlib:make-color :blue 1.0 :green 0.0 :red 0.0)
