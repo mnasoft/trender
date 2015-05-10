@@ -4,6 +4,7 @@
 
 ;;; "trender" goes here. Hacks and glory await!
 
+
 (defun pick2numbers(x-range y-range)
   (let* ((display (xlib:open-display ""))
 	 (screen (first (xlib:display-roots display)))

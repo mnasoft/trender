@@ -52,4 +52,3 @@ data.text:
 	     (aref arr k ) (aref a i 0)
 	     (aref arr (1+ k)) (aref a i j)))
 	  rez))))
-

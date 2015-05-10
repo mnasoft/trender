@@ -3,9 +3,11 @@
 (in-package #:trender)
 
 (defvar key-code-hash)
+
 (defvar key-string-hash)
 
 (defvar key-list-kbd-hp)
+
 (setf
  key-list-kbd-hp
  '(
@@ -34,7 +36,8 @@
     ("L-Alt" 64) ("Space" 65) ("R-Alt" 113) 
     ("Menu" 117))))
 
-(defvar key-list-home) 
+(defvar key-list-home)
+
 (setf
  key-list-home
  '(
@@ -60,6 +63,7 @@
    ("L-Alt" 64) ("Space" 65) ("R-Alt" 108) ("Windows" 133) ("Menu" 135)))
 
 (defvar key-list)
+
 (setf  key-list
        (cond
 	 ((equal (machine-instance) "nick-00")
@@ -68,8 +72,11 @@
 
 
 (setf key-code-hash (make-hash-table :size 256))
+
 (setf key-string-hash (make-hash-table :size 256 :test #'equal))
+
 (mapc #'(lambda(el) (setf (gethash (cadr el) key-code-hash) (car el))) key-list)
+
 (mapc #'(lambda(el) (setf (gethash (car el) key-string-hash) (cadr el))) key-list)
 
 (defun bit-to-string(bm)
