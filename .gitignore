@@ -2,6 +2,7 @@
 *.fasl
 *.lisp-temp
 *~
+\#*#
 
 # =========================
 # Directory show style
