@@ -1,15 +1,19 @@
 .directory
 *~
+*.bak
 *.FASL
 *.fasl
 *.lisp-temp
 build
-\#*#
+\#*\#
 
-# =========================
-# Directory show style
-# =========================
-.directory
+README.pdf
+README.tex
+README.html
+
+Developers-memo.html
+Developers-memo.pdf
+Developers-memo.tex
 
 # =========================
 # Operating System Files
