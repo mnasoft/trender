@@ -1,6 +1,6 @@
 ;;;;  key-scaner.lisp
 
-(in-package #:trender)
+(in-package :trender)
 
 (defun key-scaner (&key
 		     (width 160)

@@ -1,6 +1,6 @@
 ;;;;  multiple-graph.lisp
 
-(in-package #:trender)
+(in-package :trender)
 
 "Функция отображения трендов (тренд -- зависимость параметра от времени)
 Параметры:

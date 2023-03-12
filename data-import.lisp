@@ -1,6 +1,6 @@
 ;;;; data-import.lisp
 
-(in-package #:trender)
+(in-package :trender)
 
 (defun read-data-from-file(ps)
   "Выполняет чтение данных из файла, задаваемого строкой ps.

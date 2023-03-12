@@ -1,6 +1,6 @@
 ;;;;  multiple-graph.lisp
 
-(in-package #:trender)
+(in-package :trender)
 
 ;;;;(defparameter *font* "-*-lucida-medium-r-*-*-14-*-*-*-*-*-*")
 ;;(defparameter *font* "lucidasans-bold-14")

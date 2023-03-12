@@ -1,6 +1,6 @@
 ;;;; matrix.lisp
 
-(in-package #:trender)
+(in-package :trender)
 
 (defvar a)
 (defvar b)

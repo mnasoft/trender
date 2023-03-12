@@ -1,6 +1,6 @@
 ;;;; package.lisp
 
-(defpackage #:trender
+(defpackage :trender
   (:use #:cl)
   (:export key-scaner)		   ; Сканирование клавиш на клавиатуре
   (:export multi-graph)		   ; Построение тренда

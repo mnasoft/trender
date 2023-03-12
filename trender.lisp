@@ -1,6 +1,6 @@
 ;;;; trender.lisp
 
-(in-package #:trender)
+(in-package :trender)
 
 ;;; "trender" goes here. Hacks and glory await!
 

@@ -1,6 +1,6 @@
 ;;;; graph-f.lisp
 
-(in-package #:trender)
+(in-package :trender)
 
 (defun |x,f(x)| (points x-min x-max f)
   "Call f repeatly to build an array tabulating f from

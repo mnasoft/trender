@@ -1,6 +1,6 @@
 ;;;;  key.lisp
 
-(in-package #:trender)
+(in-package :trender)
 
 (defvar key-code-hash)
 
